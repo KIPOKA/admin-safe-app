@@ -16,70 +16,47 @@ export const NotificationRow: React.FC<NotificationRowProps> = ({
 }) => {
   const [showModal, setShowModal] = useState(false);
 
-  // Get urgency color scheme
+  // Urgency color scheme
   const getUrgencyColors = (urgency: string) => {
     switch (urgency.toLowerCase()) {
       case 'high':
-        return {
-          bg: 'bg-red-50',
-          border: 'border-red-200',
-          headerBg: 'bg-red-600',
-          icon: 'text-red-600'
-        };
+        return { bg: 'bg-red-50 dark:bg-red-900', border: 'border-red-200 dark:border-red-700', headerBg: 'bg-red-600', icon: 'text-red-600 dark:text-red-400' };
       case 'medium':
-        return {
-          bg: 'bg-yellow-50',
-          border: 'border-yellow-200',
-          headerBg: 'bg-yellow-600',
-          icon: 'text-yellow-600'
-        };
+        return { bg: 'bg-yellow-50 dark:bg-yellow-900', border: 'border-yellow-200 dark:border-yellow-700', headerBg: 'bg-yellow-600', icon: 'text-yellow-600 dark:text-yellow-400' };
       case 'low':
-        return {
-          bg: 'bg-green-50',
-          border: 'border-green-200',
-          headerBg: 'bg-green-600',
-          icon: 'text-green-600'
-        };
+        return { bg: 'bg-green-50 dark:bg-green-900', border: 'border-green-200 dark:border-green-700', headerBg: 'bg-green-600', icon: 'text-green-600 dark:text-green-400' };
       default:
-        return {
-          bg: 'bg-blue-50',
-          border: 'border-blue-200',
-          headerBg: 'bg-blue-600',
-          icon: 'text-blue-600'
-        };
+        return { bg: 'bg-blue-50 dark:bg-blue-900', border: 'border-blue-200 dark:border-blue-700', headerBg: 'bg-blue-600', icon: 'text-blue-600 dark:text-blue-400' };
     }
   };
 
   const urgencyColors = getUrgencyColors(notification.urgency);
 
-  // Get type icon
+  // Type icon
   const getTypeIcon = (type: string) => {
     switch (type.toLowerCase()) {
       case 'emergency':
-        return AlertTriangle;
       case 'security_alert':
         return AlertTriangle;
       case 'maintenance':
-        return MessageSquare;
       default:
         return MessageSquare;
     }
   };
-
   const TypeIcon = getTypeIcon(notification.type);
 
   return (
     <>
-      <tr className="hover:bg-gray-50 transition-colors duration-150">
+      <tr className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150">
         <td className="px-6 py-4 whitespace-nowrap">
-          <div className="font-medium text-gray-900">{notification.user}</div>
-          <div className="text-sm text-gray-500">{notification.type.replace('_', ' ')}</div>
+          <div className="font-medium text-gray-900 dark:text-gray-100">{notification.user}</div>
+          <div className="text-sm text-gray-500 dark:text-gray-300">{notification.type.replace('_', ' ')}</div>
         </td>
         <td className="px-6 py-4">
-          <div className="text-sm text-gray-900 max-w-xs truncate">{notification.message}</div>
+          <div className="text-sm text-gray-900 dark:text-gray-100 max-w-xs truncate">{notification.message}</div>
         </td>
         <td className="px-6 py-4 whitespace-nowrap">
-          <div className="flex items-center text-sm text-gray-500">
+          <div className="flex items-center text-sm text-gray-500 dark:text-gray-300">
             <MapPin className="h-4 w-4 mr-1" />
             {notification.location}
           </div>
@@ -90,7 +67,7 @@ export const NotificationRow: React.FC<NotificationRowProps> = ({
         <td className="px-6 py-4 whitespace-nowrap">
           <StatusBadge status={notification.status} />
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
           <div className="flex items-center">
             <Clock className="h-4 w-4 mr-1" />
             {notification.timestamp}
@@ -120,10 +97,10 @@ export const NotificationRow: React.FC<NotificationRowProps> = ({
         </td>
       </tr>
 
-      {/* Enhanced Modal */}
+      {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm animate-fadeIn">
-          <div className={`bg-white rounded-xl shadow-2xl w-11/12 md:w-2/3 lg:w-1/2 xl:w-2/5 max-w-2xl transform transition-all duration-300 scale-100 ${urgencyColors.border} border-2 overflow-hidden`}>
+          <div className={`bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-11/12 md:w-2/3 lg:w-1/2 xl:w-2/5 max-w-2xl transform transition-all duration-300 scale-100 ${urgencyColors.border} border-2 overflow-hidden`}>
             
             {/* Header */}
             <div className={`${urgencyColors.headerBg} px-6 py-4 text-white relative`}>
@@ -137,48 +114,44 @@ export const NotificationRow: React.FC<NotificationRowProps> = ({
                     <p className="text-sm opacity-90">{notification.type.replace('_', ' ').toUpperCase()}</p>
                   </div>
                 </div>
-                <button 
-                  onClick={() => setShowModal(false)} 
-                  className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors duration-200"
-                >
+                <button onClick={() => setShowModal(false)} className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors duration-200">
                   <X className="h-5 w-5" />
                 </button>
               </div>
             </div>
 
             {/* Body */}
-            <div className={`${urgencyColors.bg} p-6`}>
+            <div className={`${urgencyColors.bg} dark:bg-opacity-90 p-6`}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
                 {/* User Info */}
                 <div className="space-y-4">
                   <div className="flex items-start space-x-3">
-                    <div className={`p-2 ${urgencyColors.icon} bg-white rounded-lg shadow-sm`}>
+                    <div className={`p-2 ${urgencyColors.icon} bg-white dark:bg-gray-700 rounded-lg shadow-sm`}>
                       <User className="h-5 w-5" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-600 uppercase tracking-wide">User</p>
-                      <p className="text-lg font-semibold text-gray-900">{notification.user}</p>
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wide">User</p>
+                      <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">{notification.user}</p>
                     </div>
                   </div>
 
                   <div className="flex items-start space-x-3">
-                    <div className={`p-2 ${urgencyColors.icon} bg-white rounded-lg shadow-sm`}>
+                    <div className={`p-2 ${urgencyColors.icon} bg-white dark:bg-gray-700 rounded-lg shadow-sm`}>
                       <MapPin className="h-5 w-5" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-600 uppercase tracking-wide">Location</p>
-                      <p className="text-lg font-semibold text-gray-900">{notification.location}</p>
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wide">Location</p>
+                      <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">{notification.location}</p>
                     </div>
                   </div>
 
                   <div className="flex items-start space-x-3">
-                    <div className={`p-2 ${urgencyColors.icon} bg-white rounded-lg shadow-sm`}>
+                    <div className={`p-2 ${urgencyColors.icon} bg-white dark:bg-gray-700 rounded-lg shadow-sm`}>
                       <Clock className="h-5 w-5" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-600 uppercase tracking-wide">Timestamp</p>
-                      <p className="text-lg font-semibold text-gray-900">{notification.timestamp}</p>
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wide">Timestamp</p>
+                      <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">{notification.timestamp}</p>
                     </div>
                   </div>
                 </div>
@@ -186,26 +159,22 @@ export const NotificationRow: React.FC<NotificationRowProps> = ({
                 {/* Status Info */}
                 <div className="space-y-4">
                   <div className="flex items-start space-x-3">
-                    <div className={`p-2 ${urgencyColors.icon} bg-white rounded-lg shadow-sm`}>
+                    <div className={`p-2 ${urgencyColors.icon} bg-white dark:bg-gray-700 rounded-lg shadow-sm`}>
                       <AlertTriangle className="h-5 w-5" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-600 uppercase tracking-wide">Urgency</p>
-                      <div className="mt-1">
-                        <UrgencyBadge urgency={notification.urgency} />
-                      </div>
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wide">Urgency</p>
+                      <div className="mt-1"><UrgencyBadge urgency={notification.urgency} /></div>
                     </div>
                   </div>
 
                   <div className="flex items-start space-x-3">
-                    <div className={`p-2 ${urgencyColors.icon} bg-white rounded-lg shadow-sm`}>
+                    <div className={`p-2 ${urgencyColors.icon} bg-white dark:bg-gray-700 rounded-lg shadow-sm`}>
                       <CheckCircle className="h-5 w-5" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-600 uppercase tracking-wide">Status</p>
-                      <div className="mt-1">
-                        <StatusBadge status={notification.status} />
-                      </div>
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wide">Status</p>
+                      <div className="mt-1"><StatusBadge status={notification.status} /></div>
                     </div>
                   </div>
                 </div>
@@ -214,13 +183,13 @@ export const NotificationRow: React.FC<NotificationRowProps> = ({
               {/* Message */}
               <div className="mt-6">
                 <div className="flex items-start space-x-3">
-                  <div className={`p-2 ${urgencyColors.icon} bg-white rounded-lg shadow-sm flex-shrink-0`}>
+                  <div className={`p-2 ${urgencyColors.icon} bg-white dark:bg-gray-700 rounded-lg shadow-sm flex-shrink-0`}>
                     <MessageSquare className="h-5 w-5" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-600 uppercase tracking-wide mb-2">Message</p>
-                    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                      <p className="text-gray-900 leading-relaxed">{notification.message}</p>
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wide mb-2">Message</p>
+                    <div className="bg-white dark:bg-gray-700 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+                      <p className="text-gray-900 dark:text-gray-100 leading-relaxed">{notification.message}</p>
                     </div>
                   </div>
                 </div>
@@ -228,31 +197,17 @@ export const NotificationRow: React.FC<NotificationRowProps> = ({
             </div>
 
             {/* Footer */}
-            <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
-              <div className="flex justify-end space-x-3">
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors duration-200 font-medium"
-                >
-                  Close
-                </button>
-                <button
-                  onClick={() => {
-                    onStatusUpdate(notification.id, 'resolved');
-                    setShowModal(false);
-                  }}
-                  className={`px-6 py-2 ${urgencyColors.headerBg} text-white rounded-lg hover:opacity-90 transition-opacity duration-200 font-medium flex items-center space-x-2`}
-                >
-                  <CheckCircle className="h-4 w-4" />
-                  <span>Mark Resolved</span>
-                </button>
-              </div>
+            <div className="bg-gray-50 dark:bg-gray-900 px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-3">
+              <button onClick={() => setShowModal(false)} className="px-6 py-2 bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors duration-200 font-medium">
+                Close
+              </button>
+              <button onClick={() => { onStatusUpdate(notification.id, 'resolved'); setShowModal(false); }} className={`px-6 py-2 ${urgencyColors.headerBg} text-white rounded-lg hover:opacity-90 transition-opacity duration-200 font-medium flex items-center space-x-2`}>
+                <CheckCircle className="h-4 w-4" /><span>Mark Resolved</span>
+              </button>
             </div>
           </div>
         </div>
       )}
-
-      
     </>
   );
 };

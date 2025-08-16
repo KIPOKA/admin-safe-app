@@ -14,23 +14,23 @@ interface UserRowProps {
 
 export const UserRow: React.FC<UserRowProps> = ({ user, onEdit, onDelete, onView }) => {
   return (
-    <tr className="hover:bg-gray-50">
+    <tr className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150">
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="font-medium text-gray-900">{user.name}</div>
-        <div className="text-sm text-gray-500">ID: {user.id}</div>
+        <div className="font-medium text-gray-900 dark:text-gray-100">{user.name}</div>
+        <div className="text-sm text-gray-500 dark:text-gray-400">ID: {user.id}</div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="flex items-center text-sm text-gray-900 mb-1">
+        <div className="flex items-center text-sm text-gray-900 dark:text-gray-100 mb-1">
           <Mail className="h-4 w-4 mr-1" />
           {user.email}
         </div>
-        <div className="flex items-center text-sm text-gray-500">
+        <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
           <Phone className="h-4 w-4 mr-1" />
           {user.phone}
         </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="flex items-center text-sm text-gray-500">
+        <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
           <MapPin className="h-4 w-4 mr-1" />
           {user.location}
         </div>
@@ -38,10 +38,10 @@ export const UserRow: React.FC<UserRowProps> = ({ user, onEdit, onDelete, onView
       <td className="px-6 py-4 whitespace-nowrap">
         <StatusBadge status={user.status} />
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
         {user.joinDate}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 text-center">
         {user.emergencyContacts}
       </td>
       <td className="px-6 py-4 whitespace-nowrap">

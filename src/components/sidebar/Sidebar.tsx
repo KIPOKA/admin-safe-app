@@ -9,37 +9,41 @@ interface SidebarProps {
   notifications?: Notification[];
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, notifications = [] }) => {
+export const Sidebar: React.FC<SidebarProps> = ({
+  activeTab,
+  setActiveTab,
+  notifications = [],
+}) => {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
-    { 
-      id: 'notifications', 
-      label: 'Notifications', 
-      icon: Bell, 
-      badge: notifications.filter(n => n.status === 'pending').length 
+    {
+      id: 'notifications',
+      label: 'Notifications',
+      icon: Bell,
+      badge: notifications.filter((n) => n.status === 'pending').length,
     },
     { id: 'users', label: 'Users', icon: Users },
     { id: 'schedule', label: 'Schedule', icon: Calendar },
   ];
 
   return (
-    <nav className="w-64 bg-white shadow-sm border-r border-gray-200 min-h-screen">
+    <nav className="w-64 bg-white dark:bg-gray-800 shadow-sm border-r border-gray-200 dark:border-gray-700 min-h-screen">
       <div className="p-6">
         <div className="space-y-2">
           {menuItems.map((item) => (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
-                activeTab === item.id 
-                  ? 'bg-blue-100 text-blue-700' 
-                  : 'text-gray-700 hover:bg-gray-100'
+              className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors duration-200 ${
+                activeTab === item.id
+                  ? 'bg-blue-100 dark:bg-blue-700 text-blue-700 dark:text-white'
+                  : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
             >
-              <item.icon className="h-5 w-5" />
-              <span>{item.label}</span>
+              <item.icon className="h-5 w-5 flex-shrink-0" />
+              <span className="flex-1">{item.label}</span>
               {item.badge && item.badge > 0 && (
-                <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full font-semibold">
                   {item.badge}
                 </span>
               )}

@@ -8,7 +8,11 @@ interface UrgencyBadgeProps {
 
 export const UrgencyBadge: React.FC<UrgencyBadgeProps> = ({ urgency }) => {
   return (
-    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getUrgencyColor(urgency)}`}>
+    <span
+      className={`px-2 py-1 rounded-full text-xs font-medium ${getUrgencyColor(
+        urgency
+      )}`}
+    >
       {urgency.toUpperCase()}
     </span>
   );

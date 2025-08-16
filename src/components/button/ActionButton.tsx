@@ -16,11 +16,12 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
   size = 'md',
   tooltip
 }) => {
+  // Map colors for light and dark mode
   const colorMap = {
-    blue: 'text-blue-600 hover:text-blue-800',
-    green: 'text-green-600 hover:text-green-800',
-    red: 'text-red-600 hover:text-red-800',
-    gray: 'text-gray-600 hover:text-gray-800',
+    blue: 'text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200',
+    green: 'text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-200',
+    red: 'text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200',
+    gray: 'text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200',
   };
 
   const sizeMap = {

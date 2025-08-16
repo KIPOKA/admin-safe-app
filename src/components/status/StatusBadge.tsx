@@ -1,3 +1,4 @@
+// StatusBadge.tsx
 import React from 'react';
 import { getStatusColor } from '../../utils/Utils';
 
@@ -7,9 +8,12 @@ interface StatusBadgeProps {
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
   return (
-    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(status)}`}>
+    <span
+      className={`px-2 py-1 rounded-full text-xs font-medium transition-colors duration-200 ${getStatusColor(
+        status
+      )}`}
+    >
       {status.toUpperCase()}
     </span>
   );
 };
-
