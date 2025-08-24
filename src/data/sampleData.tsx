@@ -52,50 +52,7 @@ export const notificationsData: Notification[] = [
     status: 'in-progress'
   }
 ];
-
-export const usersData: UserProps[] = [
-  {
-    id: 1,
-    name: 'John Doe',
-    email: 'john@email.com',
-    phone: '+1-234-567-8901',
-    location: 'Downtown Area',
-    status: 'active',
-    joinDate: '2024-01-15',
-    emergencyContacts: 2
-  },
-  {
-    id: 2,
-    name: 'Sarah Wilson',
-    email: 'sarah@email.com',
-    phone: '+1-234-567-8902',
-    location: 'Suburb Area',
-    status: 'active',
-    joinDate: '2024-02-20',
-    emergencyContacts: 3
-  },
-  {
-    id: 3,
-    name: 'Mike Johnson',
-    email: 'mike@email.com',
-    phone: '+1-234-567-8903',
-    location: 'City Center',
-    status: 'inactive',
-    joinDate: '2024-03-10',
-    emergencyContacts: 1
-  },
-  {
-    id: 4,
-    name: 'Emily Davis',
-    email: 'emily@email.com',
-    phone: '+1-234-567-8904',
-    location: 'North District',
-    status: 'active',
-    joinDate: '2024-04-05',
-    emergencyContacts: 4
-  }
-];
-
+ 
 export const schedulesData: Schedule[] = [
   {
     id: 1,

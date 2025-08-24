@@ -12,9 +12,10 @@ import { StatusBadge } from './components/status/StatusBadge';
 import { UrgencyBadge } from './components/status/UrgencyBadge';
 import { ActionButton } from './components/button/ActionButton';
   // Sample data
-import { notificationsData, usersData, schedulesData } from './data/sampleData';
+import { notificationsData,  schedulesData } from './data/sampleData';
 // Import types
 import { Notification, Schedule, UserProps } from "./components/interface/Notification"
+import UserTable from './components/user/UserTable';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -22,12 +23,12 @@ const App: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const [notifications, setNotifications] = useState<Notification[]>(notificationsData);
-  const [users, setUsers] = useState<UserProps[]>(usersData);
+ 
   const [schedules] = useState<Schedule[]>(schedulesData);
 
   // Handle login
   const handleLogin = (credentials: { email: string; password: string }) => {
-    if (credentials.email === 'admin@gmail.com' && credentials.password === '123') {
+    if (credentials.email === 'admin' && credentials.password === '123') {
       setIsAuthenticated(true);
     } else {
       alert('Invalid credentials. Use admin@safetyapp.com / admin123');
@@ -47,16 +48,13 @@ const App: React.FC = () => {
     ));
   };
 
-  // User management functions
-  const handleViewUser = (id: number) => console.log('View user:', id);
-  const handleEditUser = (id: number) => console.log('Edit user:', id);
-  const handleDeleteUser = (id: number) => setUsers(users.filter(user => user.id !== id));
+ 
 
   // Dashboard Overview Component
   const DashboardOverview: React.FC = () => (
     <div className="space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatsCard title="Total Users" value={users.length} icon={Users} color="blue" />
+        {/* <StatsCard title="Total Users" value={users.length} icon={Users} color="blue" /> */}
         <StatsCard title="Active Alerts" value={notifications.filter(n => n.status === 'pending').length} icon={Bell} color="red" />
         <StatsCard title="Scheduled Tasks" value={schedules.length} icon={Calendar} color="green" />
         <StatsCard title="High Priority" value={notifications.filter(n => n.urgency === 'high').length} icon={AlertTriangle} color="orange" />
@@ -154,70 +152,7 @@ const App: React.FC = () => {
     );
   };
 
-  // Users Tab
-  const UsersTab: React.FC = () => {
-    const filteredUsers = users.filter(user =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.location.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">User Management</h2>
-          <div className="flex items-center space-x-4">
-            <SearchBar placeholder="Search users..." value={searchTerm} onChange={setSearchTerm} />
-            <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
-              <Plus className="h-4 w-4" />
-              <span>Add User</span>
-            </button>
-          </div>
-        </div>
-
-        <Grid subtitle={`Managing ${filteredUsers.length} users`} columns={3} showHeader={false}>
-          {filteredUsers.map((user) => (
-            <div key={user.id} className="bg-white dark:bg-gray-900 rounded-lg shadow p-4 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow duration-200">
-              <CardHeader
-                title={user.name}
-                subtitle={`Member since ${user.joinDate}`}
-                icon={<User className="w-5 h-5 text-gray-700 dark:text-gray-300" />}
-                badge={<StatusBadge status={user.status} />}
-              />
-              <CardBody>
-                <div className="space-y-3">
-                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                    <Mail className="w-4 h-4 mr-2" />
-                    {user.email}
-                  </div>
-                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                    <Phone className="w-4 h-4 mr-2" />
-                    {user.phone}
-                  </div>
-                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                    <MapPin className="w-4 h-4 mr-2" />
-                    {user.location}
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">Emergency Contacts:</span>
-                    <span className="font-semibold text-gray-900 dark:text-gray-100">{user.emergencyContacts}</span>
-                  </div>
-                </div>
-              </CardBody>
-              <CardFooter>
-                <span className="text-sm text-gray-500 dark:text-gray-400">ID: {user.id}</span>
-                <div className="flex space-x-2">
-                  <ActionButton icon={Eye} onClick={() => handleViewUser(user.id)} color="blue" tooltip="View Details" />
-                  <ActionButton icon={Edit} onClick={() => handleEditUser(user.id)} color="green" tooltip="Edit User" />
-                  <ActionButton icon={Trash2} onClick={() => handleDeleteUser(user.id)} color="red" tooltip="Delete User" />
-                </div>
-              </CardFooter>
-            </div>
-          ))}
-        </Grid>
-      </div>
-    );
-  };
+ 
 
   // Schedule Tab
   const ScheduleTab: React.FC = () => (
@@ -274,7 +209,7 @@ const App: React.FC = () => {
     switch(activeTab) {
       case 'dashboard': return <DashboardOverview />;
       case 'notifications': return <NotificationsTab />;
-      case 'users': return <UsersTab />;
+      case 'users': return <UserTable />;
       case 'schedule': return <ScheduleTab />;
       default: return <DashboardOverview />;
     }

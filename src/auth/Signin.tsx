@@ -40,7 +40,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isLoading = false, error 
               <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <input
                 id="email"
-                type="email"
+                type="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
