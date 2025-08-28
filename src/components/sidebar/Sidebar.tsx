@@ -22,8 +22,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       icon: Bell,
       badge: notifications.filter((n) => n.status === 'pending').length,
     },
-    { id: 'users', label: 'Users', icon: Users },
-    { id: 'schedule', label: 'Schedule', icon: Calendar },
+    { id: 'users', label: 'Users', icon: Users }, 
   ];
 
   return (

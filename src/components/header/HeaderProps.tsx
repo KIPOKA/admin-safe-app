@@ -1,27 +1,72 @@
 import React, { useState, useEffect } from 'react';
 import { AlertTriangle, Bell, Settings, X } from 'lucide-react';
 import Swal from 'sweetalert2';
-import { Notification } from '../interface/Notification';
 
+export interface Notification {
+  id: number;
+  status: { id: number; name: string };
+  user: { id: number; fullName: string; allergies?: string };
+  emergencyType: { id: number; name: string; description: string };
+  createdAt: string;
+  updatedAt?: string;
+  message?: string;
+  timestamp?: string;
+}
+
+// ================= PROPS =================
 interface HeaderProps {
-  notifications?: Notification[];
   onLogout?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ notifications = [], onLogout }) => {
+// ================= COMPONENT =================
+export const Header: React.FC<HeaderProps> = ({ onLogout }) => {
+  const API_BASE_URL = 'http://localhost:3000/api/notifications';
+
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [showNotificationPanel, setShowNotificationPanel] = useState(false);
   const [showSettingsPanel, setShowSettingsPanel] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
-  const pendingNotifications = notifications.filter(n => n.status === 'pending');
-
-  // Apply theme to document
-  useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+  // Fetch notifications from API
+  const fetchNotifications = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await fetch(`${API_BASE_URL}/`);
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
+   
+      // Assume your API returns { notifications: [...] }
+      setNotifications(data.notifications);
+    } catch (err) {
+      console.error(err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch notifications');
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+
+    // Optional: poll every 30 seconds
+    const interval = setInterval(fetchNotifications, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Filter pending notifications
+  const pendingNotifications = notifications
+    .filter((n) => n.status.name.toLowerCase() === 'pending')
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+  const newestNotification = pendingNotifications[0];
+
+  // Apply theme
+  useEffect(() => {
+    if (theme === 'dark') document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
   }, [theme]);
 
   const handleLogoutClick = () => {
@@ -35,10 +80,13 @@ export const Header: React.FC<HeaderProps> = ({ notifications = [], onLogout }) 
       confirmButtonText: 'Yes, logout',
       cancelButtonText: 'Cancel',
     }).then((result) => {
-      if (result.isConfirmed && onLogout) {
-        onLogout();
-      }
+      if (result.isConfirmed && onLogout) onLogout();
     });
+  };
+
+  const formatTimestamp = (timestamp?: string) => {
+    if (!timestamp) return '';
+    return new Date(timestamp).toLocaleString();
   };
 
   return (
@@ -49,7 +97,9 @@ export const Header: React.FC<HeaderProps> = ({ notifications = [], onLogout }) 
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
             <AlertTriangle className="h-5 w-5 text-white" />
           </div>
-          <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">Ubuntu Safety Admin</h1>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+            Ubuntu Safety Admin
+          </h1>
         </div>
 
         {/* Actions */}
@@ -61,7 +111,7 @@ export const Header: React.FC<HeaderProps> = ({ notifications = [], onLogout }) 
               onClick={() => setShowNotificationPanel(true)}
             />
             {pendingNotifications.length > 0 && (
-              <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">
                 {pendingNotifications.length}
               </span>
             )}
@@ -95,20 +145,37 @@ export const Header: React.FC<HeaderProps> = ({ notifications = [], onLogout }) 
             />
             <div className="relative w-96 bg-white dark:bg-gray-800 shadow-lg overflow-y-auto">
               <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Pending Notifications</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  Pending Notifications
+                </h2>
                 <button onClick={() => setShowNotificationPanel(false)}>
                   <X className="h-5 w-5 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100" />
                 </button>
               </div>
               <div className="p-4 space-y-3">
-                {pendingNotifications.length === 0 && (
+                {loading && <p>Loading...</p>}
+                {error && <p className="text-red-500">{error}</p>}
+                {pendingNotifications.length === 0 && !loading && (
                   <p className="text-gray-500 dark:text-gray-300">No pending notifications.</p>
                 )}
                 {pendingNotifications.map((notif) => (
-                  <div key={notif.id} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm">
-                    <p className="text-gray-700 dark:text-gray-100 font-medium">{notif.user}</p>
-                    <p className="text-gray-500 dark:text-gray-300 text-sm">{notif.message}</p>
-                    <p className="text-gray-400 dark:text-gray-400 text-xs">{notif.timestamp}</p>
+                  <div
+                    key={notif.id}
+                    className={`p-3 rounded-lg shadow-sm ${
+                      notif.id === newestNotification?.id
+                        ? 'bg-blue-50 dark:bg-blue-900'
+                        : 'bg-gray-50 dark:bg-gray-700'
+                    }`}
+                  >
+                    <p className="text-gray-900 dark:text-gray-100 font-semibold">
+                      {notif.user.fullName} - {notif.emergencyType.name}
+                    </p>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm">
+                      {notif.emergencyType.description}
+                    </p>
+                    <p className="text-gray-400 dark:text-gray-400 text-xs">
+                      {formatTimestamp(notif.createdAt)}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -125,15 +192,18 @@ export const Header: React.FC<HeaderProps> = ({ notifications = [], onLogout }) 
             />
             <div className="relative w-96 bg-white dark:bg-gray-800 shadow-lg overflow-y-auto">
               <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Application Settings</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  Application Settings
+                </h2>
                 <button onClick={() => setShowSettingsPanel(false)}>
                   <X className="h-5 w-5 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100" />
                 </button>
               </div>
               <div className="p-4 space-y-4">
-                {/* Theme Selector */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Theme</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Theme
+                  </label>
                   <select
                     className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     value={theme}
@@ -143,34 +213,6 @@ export const Header: React.FC<HeaderProps> = ({ notifications = [], onLogout }) 
                     <option value="dark">Dark</option>
                   </select>
                 </div>
-
-                {/* Notification Preferences */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Notification Preferences</label>
-                  <div className="mt-2 space-y-2">
-                    <label className="flex items-center space-x-2">
-                      <input type="checkbox" className="h-4 w-4" />
-                      <span className="dark:text-gray-200">Email Alerts</span>
-                    </label>
-                    <label className="flex items-center space-x-2">
-                      <input type="checkbox" className="h-4 w-4" />
-                      <span className="dark:text-gray-200">Push Notifications</span>
-                    </label>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Other Settings</label>
-                  <input
-                    type="text"
-                    className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                    placeholder="Example setting"
-                  />
-                </div>
-
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  Save Settings
-                </button>
               </div>
             </div>
           </div>

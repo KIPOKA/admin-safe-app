@@ -95,3 +95,47 @@ export interface Schedule {
   duration: string;
   status: 'scheduled' | 'in-progress' | 'completed';
 }
+export interface UserData {
+  id: number;
+  fullName: string;
+  allergies?: string;
+  emergencyContacts: EmergencyContact[];
+  bloodType: BloodType;
+  medicalAid: MedicalAid;
+}
+export interface NotificationStatus {
+  id: number;
+  name: string;
+}
+
+export interface ApiNotification {
+  notification_id: number; // ✅ match API
+  fromUserId: number;
+  emergencyTypeId: number;
+  statusId: number;
+  createdAt: string;
+  updatedAt: string;
+  user: UserData;
+  status: NotificationStatus;
+  emergencyType: EmergencyType;
+}
+
+export interface DisplayNotification {
+  notificationId: number;
+  user: string;
+  type: string;
+  message: string;
+  location: string;
+  urgency: string;
+  status: string;
+  timestamp: string;
+  userData?: UserData;
+  emergencyType?: EmergencyType;
+  resolutionMessage?: string;
+}
+
+export interface EmergencyType {
+  id: number;
+  name: string;
+  description: string;
+}

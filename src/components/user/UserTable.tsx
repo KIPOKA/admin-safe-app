@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, Phone, Mail, Eye, Edit, Trash2, Heart, Activity, UserCheck, User, Calendar, Sparkles, X } from 'lucide-react';
+import { MapPin, Phone, Mail, Eye, Trash2, Heart, Activity, UserCheck, User, X } from 'lucide-react';
 
 // Type definitions
 interface GridProps {
@@ -170,7 +170,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onView,  onDelete }) => {
         subtitle={`Member since ${user.joinDate}`}
         badge={<StatusBadge status={user.status} />}
       />
-      <hr className='border border-2 mb-2'/>
+      <hr className='border mb-2'/>
 
       <CardBody>
             <div className="flex items-center gap-2">
@@ -214,7 +214,7 @@ const UserModal: React.FC<ModalProps> = ({ user, isOpen, onClose }) => {
         </button>
 
         <h2 className="text-2xl font-bold mb-6">{user.name} - Details</h2>
-        <hr className='border border-2 mb-2'/>
+        <hr className='border  mb-2'/>
 
         <div className="space-y-3">
           <div className="flex items-center gap-3">

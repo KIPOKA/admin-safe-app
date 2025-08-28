@@ -1,3 +1,4 @@
+import { Notification } from "../components/interface/Notification";
 // utils.ts
 export const getStatusColor = (status: string): string => {
   switch (status) {
@@ -33,4 +34,18 @@ export const getUrgencyColor = (urgency: string): string => {
     default:
       return 'text-gray-600 bg-gray-100 dark:text-gray-200 dark:bg-gray-800';
   }
+};
+
+
+export const mapApiNotification = (apiNotif: any): Notification => {
+  return {
+    id: apiNotif.id,
+    user: apiNotif.user?.fullName || "Unknown User",
+    type: apiNotif.emergencyType?.name || "General",
+    message: apiNotif.emergencyType?.description || "No details provided",
+    location: apiNotif.user?.address || "Unknown location",
+    urgency: apiNotif.urgency || "medium",  
+    status: apiNotif.status?.name || "Pending",
+    timestamp: new Date(apiNotif.createdAt).toLocaleString(),
+  };
 };
