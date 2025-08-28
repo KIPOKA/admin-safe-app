@@ -4,6 +4,7 @@ import { Header } from './components/header/HeaderProps';
 import { Sidebar } from './components/sidebar/Sidebar';
 import NotificationRow from './components/notification/NotificationRow';
 import UserTable from './components/user/UserTable';
+import Analytics from './components/analytics/Analytics';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -31,12 +32,19 @@ const App: React.FC = () => {
     </div>
   ); 
 
+   const AnalyticsView: React.FC = () => (
+    <div>
+      <Analytics />   
+    </div>
+  ); 
+
   // Render tab content
   const renderTabContent = () => {
     switch(activeTab) {
       case 'dashboard': return <DashboardOverview />;
       case 'notifications': return <NotificationRow />;
       case 'users': return <UserTable />;
+      case 'analytics': return <AnalyticsView/>
       default: return <DashboardOverview />;
     }
   };

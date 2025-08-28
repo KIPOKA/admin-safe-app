@@ -1,6 +1,6 @@
 // Sidebar.tsx
 import React from 'react';
-import { BarChart3, Bell, Users, Calendar } from 'lucide-react';
+import { BarChart3, Bell, Users, ChartBar } from 'lucide-react';
 import { Notification } from '../interface/Notification';
 
 interface SidebarProps {
@@ -23,6 +23,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       badge: notifications.filter((n) => n.status === 'pending').length,
     },
     { id: 'users', label: 'Users', icon: Users }, 
+    {id: 'analytics', label: 'Analytics', icon:ChartBar}
   ];
 
   return (
