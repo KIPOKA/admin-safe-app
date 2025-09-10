@@ -50,7 +50,7 @@ export interface UserProps {
   name: string;
   email: string;
   phone: string;
-  location: string;
+  location: Location;
   status: 'active' | 'inactive' | 'pending';
   joinDate: string;
   allergies: string;
@@ -118,6 +118,23 @@ export interface ApiNotification {
   user: UserData;
   status: NotificationStatus;
   emergencyType: EmergencyType;
+  location?: {
+    id?: number;
+    city?: string;
+    country?: string;
+    latitude?: number;
+    longitude?: number;
+    description?: string;
+  };
+}
+
+interface Location {
+  id: number;         
+  latitude: number;
+  longitude: number;
+  city: string;
+  country: string;
+  description: string;  
 }
 
 export interface DisplayNotification {
@@ -125,7 +142,7 @@ export interface DisplayNotification {
   user: string;
   type: string;
   message: string;
-  location: string;
+  location?: Location; // <-- change from string to object
   urgency: string;
   status: string;
   timestamp: string;
@@ -133,6 +150,15 @@ export interface DisplayNotification {
   emergencyType?: EmergencyType;
   resolutionMessage?: string;
 }
+export interface TableSectionProps {
+  title: string;
+  notifications: DisplayNotification[];
+  onStatusUpdate?: (id: number, status: string) => void;
+  onDelete: (id: number) => void;
+  readOnly?: boolean;
+}
+
+
 
 export interface EmergencyType {
   id: number;

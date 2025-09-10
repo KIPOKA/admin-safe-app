@@ -76,10 +76,12 @@ const ActionButton: React.FC<{
   );
 };
 
-const  NotificationDeatils: React.FC<{
+const NotificationDeatils: React.FC<{
   notification: DisplayNotification;
-  onStatusUpdate: (id: number, status: string) => void;
-}> = ({ notification, onStatusUpdate }) => {
+  onStatusUpdate?: (id: number, status: string) => void; 
+  readOnly?: boolean; // add this
+}> = ({ notification, onStatusUpdate, readOnly = false }) => { 
+
   const [showModal, setShowModal] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState(notification.status);
 
@@ -123,12 +125,28 @@ const  NotificationDeatils: React.FC<{
         <td className="px-6 py-4">
           <div className="text-sm text-gray-900 dark:text-gray-100 max-w-xs truncate">{notification.message}</div>
         </td>
-        <td className="px-6 py-4 whitespace-nowrap">
-          <div className="flex items-center text-sm text-gray-500 dark:text-gray-300">
-            <MapPin className="h-4 w-4 mr-1" />
-            {notification.location}
-          </div>
-        </td>
+            <div className="flex items-center space-x-3">
+              <td className="px-6 py-4 whitespace-nowrap">
+              <div className="flex items-center space-x-3">
+                <div className={`p-2 ${urgencyColors.icon} bg-white dark:bg-gray-700 rounded-lg shadow-sm`}>
+                  <MapPin className="h-5 w-5" />
+                </div>
+                <div className="flex flex-col text-sm text-gray-500 dark:text-gray-300">
+                  <p className="font-medium">Location</p>
+                  <div className="flex items-center"> 
+                    {notification.location?.city || 'Unknown City'}, {notification.location?.country || 'Unknown Country'}
+                  </div>
+                  <div className="text-xs text-gray-400 dark:text-gray-400 truncate">
+                    Lat: {notification.location?.latitude ?? 'N/A'}, Lng: {notification.location?.longitude ?? 'N/A'}
+                  </div>
+                  {notification.location?.description && (
+                    <p className="text-xs italic mt-1">{notification.location.description}</p>
+                  )}
+                </div>
+              </div>
+            </td> 
+             </div>
+
         <td className="px-6 py-4 whitespace-nowrap">
           <UrgencyBadge urgency={notification.urgency} />
         </td>
@@ -137,7 +155,8 @@ const  NotificationDeatils: React.FC<{
             value={selectedStatus}
             onChange={(e) => {
               setSelectedStatus(e.target.value);
-              onStatusUpdate(notification.notificationId, e.target.value);
+             onStatusUpdate?.(notification.notificationId, selectedStatus);
+
             }}
             className="border border-gray-300 rounded-md p-1 text-sm"
           >
@@ -158,8 +177,14 @@ const  NotificationDeatils: React.FC<{
           <div className="flex items-center space-x-2">
             <ActionButton icon={CheckCircle} onClick={() => setShowModal(true)} color="green" tooltip="Edit Status" />
             <ActionButton icon={Eye} onClick={() => setShowModal(true)} color="blue" tooltip="View details" />
-            <ActionButton icon={XCircle} onClick={() => onStatusUpdate(notification.notificationId, 'dismissed')} color="red" tooltip="delete" />
-          </div>
+              <ActionButton
+              icon={XCircle}
+              onClick={() => !readOnly && onStatusUpdate?.(notification.notificationId, 'dismissed')}
+              color="red"
+              tooltip="delete"
+            />
+
+            </div>
         </td>
       </tr>
 
@@ -207,10 +232,16 @@ const  NotificationDeatils: React.FC<{
                     <div className={`p-2 ${urgencyColors.icon} bg-white dark:bg-gray-700 rounded-lg shadow-sm`}>
                       <MapPin className="h-5 w-5" />
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wide">Location</p>
-                      <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">{notification.location}</p>
-                    </div>
+                    <div className="flex flex-col text-sm text-gray-500 dark:text-gray-300">
+                          <div className="flex items-center">
+                            <MapPin className="h-4 w-4 mr-1" />
+                            {notification.location?.city || 'Unknown City'}, {notification.location?.country || 'Unknown Country'}
+                          </div>
+                          <div className="text-xs text-gray-400 dark:text-gray-400 truncate">
+                            Lat: {notification.location?.latitude}, Lng: {notification.location?.longitude}
+                          </div>
+                        </div>
+
                   </div>
 
                   <div className="flex items-start space-x-3">
@@ -311,7 +342,7 @@ const  NotificationDeatils: React.FC<{
               <button onClick={() => setShowModal(false)} className="px-6 py-2 bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors duration-200 font-medium">
                 Close
               </button>
-              <button onClick={() => { onStatusUpdate(notification.notificationId, selectedStatus); setShowModal(false); }} className={`px-6 py-2 ${urgencyColors.headerBg} text-white rounded-lg hover:opacity-90 transition-opacity duration-200 font-medium flex items-center space-x-2`}>
+              <button onClick={() => { onStatusUpdate?.(notification.notificationId, selectedStatus);setShowModal(false); }} className={`px-6 py-2 ${urgencyColors.headerBg} text-white rounded-lg hover:opacity-90 transition-opacity duration-200 font-medium flex items-center space-x-2`}>
                 <CheckCircle className="h-4 w-4" /><span>Update Status</span>
               </button>
 
