@@ -142,7 +142,7 @@ export interface DisplayNotification {
   user: string;
   type: string;
   message: string;
-  location?: Location; // <-- change from string to object
+  location?: Location;
   urgency: string;
   status: string;
   timestamp: string;

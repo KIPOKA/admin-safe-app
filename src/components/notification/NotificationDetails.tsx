@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { MapPin, Clock, CheckCircle, Eye, XCircle, User, MessageSquare, AlertTriangle, X, RefreshCw } from 'lucide-react';
-import { ApiNotification, DisplayNotification } from '../interface/Notification';
+import React, { useState } from 'react';
+import { MapPin, Clock, CheckCircle, Eye, XCircle, User, MessageSquare, AlertTriangle, X } from 'lucide-react';
+import { DisplayNotification } from '../interface/Notification';
 
 
 // Badge components (unchanged)
@@ -24,27 +24,7 @@ const UrgencyBadge: React.FC<{ urgency: string }> = ({ urgency }) => {
   );
 };
 
-const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
-  const getStatusStyle = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'resolved':
-        return 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900 dark:text-green-200 dark:border-green-700';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900 dark:text-yellow-200 dark:border-yellow-700';
-      case 'dismissed':
-        return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600';
-      case 'read':
-        return 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-700';
-      default:
-        return 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900 dark:text-purple-200 dark:border-purple-700';
-    }
-  };
-  return (
-    <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusStyle(status)}`}>
-      {status.toUpperCase()}
-    </span>
-  );
-};
+ 
 
 // ActionButton
 const ActionButton: React.FC<{
@@ -119,7 +99,9 @@ const NotificationDeatils: React.FC<{
     <>
       <tr className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150">
         <td className="px-6 py-4 whitespace-nowrap">
-          <div className="font-medium text-gray-900 dark:text-gray-100">{notification.user}</div>
+          <div className="font-medium text-gray-900 dark:text-gray-100">{notification.user}</div> 
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap">  
           <div className="text-sm text-gray-500 dark:text-gray-300">{notification.type.replace('_', ' ')}</div>
         </td>
         <td className="px-6 py-4">
@@ -128,11 +110,9 @@ const NotificationDeatils: React.FC<{
             <div className="flex items-center space-x-3">
               <td className="px-6 py-4 whitespace-nowrap">
               <div className="flex items-center space-x-3">
-                <div className={`p-2 ${urgencyColors.icon} bg-white dark:bg-gray-700 rounded-lg shadow-sm`}>
-                  <MapPin className="h-5 w-5" />
-                </div>
+              
                 <div className="flex flex-col text-sm text-gray-500 dark:text-gray-300">
-                  <p className="font-medium">Location</p>
+                 
                   <div className="flex items-center"> 
                     {notification.location?.city || 'Unknown City'}, {notification.location?.country || 'Unknown Country'}
                   </div>
@@ -175,7 +155,7 @@ const NotificationDeatils: React.FC<{
         </td>
         <td className="px-6 py-4 whitespace-nowrap">
           <div className="flex items-center space-x-2">
-            <ActionButton icon={CheckCircle} onClick={() => setShowModal(true)} color="green" tooltip="Edit Status" />
+             
             <ActionButton icon={Eye} onClick={() => setShowModal(true)} color="blue" tooltip="View details" />
               <ActionButton
               icon={XCircle}
@@ -183,7 +163,6 @@ const NotificationDeatils: React.FC<{
               color="red"
               tooltip="delete"
             />
-
             </div>
         </td>
       </tr>

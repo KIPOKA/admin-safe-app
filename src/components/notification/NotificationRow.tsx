@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, Bell, XCircle } from 'lucide-react';
+import { RefreshCw, Bell, XCircle, MapPin, AlertTriangle } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { ApiNotification, DisplayNotification, TableSectionProps } from '../interface/Notification';
 import NotificationDetails from './NotificationDetails';
@@ -72,6 +72,7 @@ const NotificationProps: React.FC = () => {
       
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json(); 
+      console.log(data)
       setNotifications(data.notifications.map(convertApiNotification));
     } catch (err) {
       console.error(err);
@@ -169,58 +170,76 @@ const NotificationProps: React.FC = () => {
     return isNaN(parsed.getTime()) ? null : parsed;
   };
 
-  const getFilteredNotifications = () => {
-    let filtered = notifications;
+// Add state for sorting
+const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
 
-    if (filter !== 'all') filtered = filtered.filter(n => n.status === filter);
+// Update getFilteredNotifications
 
-    if (dateFilter !== 'all') {
-      const now = new Date();
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      filtered = filtered.filter(n => {
-        const notificationDate = parseTimestampToDate(n.timestamp);
-        if (!notificationDate) return false;
-        const notificationDay = new Date(notificationDate.getFullYear(), notificationDate.getMonth(), notificationDate.getDate());
-        switch (dateFilter) {
-          case 'today': return notificationDay.getTime() === today.getTime();
-          case 'yesterday': {
-            const yesterday = new Date(today);
-            yesterday.setDate(yesterday.getDate() - 1);
-            return notificationDay.getTime() === yesterday.getTime();
-          }
-          case 'last7days': {
-            const sevenDaysAgo = new Date(today);
-            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-            return notificationDate >= sevenDaysAgo;
-          }
-          case 'last30days': {
-            const thirtyDaysAgo = new Date(today);
-            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-            return notificationDate >= thirtyDaysAgo;
-          }
-          case 'thisweek': {
-            const startOfWeek = new Date(today);
-            startOfWeek.setDate(today.getDate() - today.getDay());
-            return notificationDate >= startOfWeek;
-          }
-          case 'thismonth': {
-            const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-            return notificationDate >= startOfMonth;
-          }
-          default: return true;
+const getFilteredNotifications = () => {
+  let filtered = notifications;
+
+  // Filter by status
+  if (filter !== 'all') filtered = filtered.filter(n => n.status === filter);
+
+  // Filter by date (today, yesterday, last7days, etc.)
+  if (dateFilter !== 'all') {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    filtered = filtered.filter(n => {
+      const notificationDate = parseTimestampToDate(n.timestamp);
+      if (!notificationDate) return false;
+      const notificationDay = new Date(notificationDate.getFullYear(), notificationDate.getMonth(), notificationDate.getDate());
+      switch (dateFilter) {
+        case 'today': return notificationDay.getTime() === today.getTime();
+        case 'yesterday': {
+          const yesterday = new Date(today);
+          yesterday.setDate(yesterday.getDate() - 1);
+          return notificationDay.getTime() === yesterday.getTime();
         }
-      });
-    }
-
-    const urgencyOrder: { [key: string]: number } = { high: 1, medium: 2, low: 3 };
-    const statusOrder: { [key: string]: number } = { pending: 1, read: 2, resolved: 3, dismissed: 4 };
-
-    return [...filtered].sort((a, b) => {
-      const urgencyCompare = (urgencyOrder[a.urgency] || 99) - (urgencyOrder[b.urgency] || 99);
-      if (urgencyCompare !== 0) return urgencyCompare;
-      return (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99);
+        case 'last7days': {
+          const sevenDaysAgo = new Date(today);
+          sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+          return notificationDate >= sevenDaysAgo;
+        }
+        case 'last30days': {
+          const thirtyDaysAgo = new Date(today);
+          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+          return notificationDate >= thirtyDaysAgo;
+        }
+        case 'thisweek': {
+          const startOfWeek = new Date(today);
+          startOfWeek.setDate(today.getDate() - today.getDay());
+          return notificationDate >= startOfWeek;
+        }
+        case 'thismonth': {
+          const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+          return notificationDate >= startOfMonth;
+        }
+        default: return true;
+      }
     });
-  };
+  }
+
+  const urgencyOrder: { [key: string]: number } = { high: 1, medium: 2, low: 3 };
+  const statusOrder: { [key: string]: number } = { pending: 1, read: 2, resolved: 3, dismissed: 4 };
+
+  return [...filtered].sort((a, b) => {
+    const dateA = parseTimestampToDate(a.timestamp)?.getTime() ?? 0;
+    const dateB = parseTimestampToDate(b.timestamp)?.getTime() ?? 0;
+
+    if (sortOrder === 'newest') return dateB - dateA;
+    if (sortOrder === 'oldest') return dateA - dateB;
+
+    // Default sorting: urgency → status → date
+    const urgencyCompare = (urgencyOrder[a.urgency] || 99) - (urgencyOrder[b.urgency] || 99);
+    if (urgencyCompare !== 0) return urgencyCompare;
+
+    const statusCompare = (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99);
+    if (statusCompare !== 0) return statusCompare;
+
+    return dateB - dateA; // newest first as tie breaker
+  });
+};
 
   // --- Notification stats ---
   const totalCount = notifications.length;
@@ -263,7 +282,7 @@ const NotificationProps: React.FC = () => {
             <p className="text-3xl font-extrabold text-indigo-900 dark:text-white">{totalCount}</p>
           </div>
 
-  {/* Individual Status Cards */}
+        {/* Individual Status Cards */}
         {['pending', 'read', 'resolved', 'dismissed'].map((statusKey) => {
           const colors: Record<string, string> = {
             pending: "from-yellow-100 to-yellow-200 dark:from-yellow-700 dark:to-yellow-800 text-yellow-800 dark:text-yellow-100",
@@ -314,6 +333,19 @@ const NotificationProps: React.FC = () => {
             <option value="thismonth">📅 This Month</option>
             <option value="last30days">📊 Last 30 Days</option>
           </select>
+          {/* Sort Dropdown */}
+         
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-200">Sort by:</label>
+            <select
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value as 'newest' | 'oldest')}
+              className="border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 shadow-sm"
+            >
+              <option value="newest">🆕 Newest → Oldest</option>
+              <option value="oldest">📜 Oldest → Newest</option>
+            </select>
+     
+
         </div>
 
         {/* Active Notifications */}
@@ -349,31 +381,36 @@ const NotificationProps: React.FC = () => {
 
 const TableSection: React.FC<TableSectionProps> = ({ title, notifications, onStatusUpdate, onDelete, readOnly }) => {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden mb-8">
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-gray-700 dark:to-gray-800">
-        <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-          <Bell className="w-5 h-5 text-indigo-600" /> {title}
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden mb-6">
+      <div className="p-3 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-gray-700 dark:to-gray-800">
+        <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-1">
+          <Bell className="w-4 h-4 text-indigo-600" /> {title}
         </h2>
       </div>
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-xs">
           <thead className="bg-indigo-50 dark:bg-gray-700">
-            <tr className="text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase">
-              <th className="px-4 py-3">👤 User & Type</th>
-              <th className="px-4 py-3">💬 Message</th>
-              <th className="px-4 py-3">📍 Location</th>
-              <th className="px-4 py-3">⚡ Urgency</th>
-              <th className="px-4 py-3">📌 Status</th>
-              <th className="px-4 py-3">⏰ Time</th>
-              <th className="px-4 py-3">⚙️ Actions</th>
+            <tr className="text-left font-medium text-gray-600 dark:text-gray-300 uppercase">
+              <th className="px-2 py-2">👤 User</th>
+               <th className="px-2 py-2 flex items-center gap-1">
+                <AlertTriangle className="h-4 w-4 text-yellow-500" /> Emergency 
+              </th>
+              <th className="px-2 py-2">💬 Message</th>
+              <th className="px-2 py-2 flex items-center gap-1">
+                <MapPin className="h-4 w-4 text-red-500" /> Location
+              </th>
+              <th className="px-2 py-2">⚡ Urgency</th>
+              <th className="px-2 py-2">📌 Status</th>
+              <th className="px-2 py-2">⏰ Time</th>
+              <th className="px-2 py-2">⚙️ Actions</th>
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
             {notifications.map(notification => (
-              <NotificationDetails 
-                key={notification.notificationId} 
-                notification={notification} 
-                onStatusUpdate={readOnly ? undefined : onStatusUpdate} 
+              <NotificationDetails
+                key={notification.notificationId}
+                notification={notification}
+                onStatusUpdate={readOnly ? undefined : onStatusUpdate}
                 readOnly={readOnly}
               />
             ))}
@@ -383,5 +420,6 @@ const TableSection: React.FC<TableSectionProps> = ({ title, notifications, onSta
     </div>
   );
 };
+
 
 export default NotificationProps;
